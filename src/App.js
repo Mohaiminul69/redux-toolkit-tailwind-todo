@@ -1,56 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import { useEffect, useState } from "react";
+import { Toaster } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import FormModal from "./components/form-modal";
+import LoadingSpinner from "./components/loading-spinner";
+import Navbar from "./components/navbar";
+import { getTodos } from "./store/slices/todoSlice";
+import Sort from "./components/sort";
+import TodoList from "./components/todo-list";
 
 function App() {
+  const [open, setOpen] = useState(false);
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.todos.loading);
+  const [darkMode, setDarkMode] = useState(true);
+
+  useEffect(() => {
+    dispatch(getTodos());
+  }, [dispatch]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
+    <div className={`${darkMode === false ? "" : "dark"}`}>
+      <div className="bg-white dark:bg-[#313641] min-h-screen">
+        <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+        <div className="container mx-auto relative">
+          <div className="flex mt-10 mb-3 relative items-center justify-center">
+            <Sort />
+            <h1 className="text-center dark:text-white text-2xl font-semibold">
+              Redux Todo App
+            </h1>
+            <button
+              onClick={() => setOpen(true)}
+              className="rounded-lg bg-[#267191] px-4 py-2 absolute right-0 text-white"
+            >
+              Add Task
+            </button>
+          </div>
+          <div className="container flex flex-wrap items-center justify-between mx-auto">
+            <TodoList />
+          </div>
+          <FormModal open={open} setOpen={setOpen} />
+        </div>
+        <Toaster position="top-center" reverseOrder={false} />
+        {loading && <LoadingSpinner />}
+      </div>
     </div>
   );
 }
