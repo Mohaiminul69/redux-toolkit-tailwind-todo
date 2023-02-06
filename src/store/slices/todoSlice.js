@@ -1,7 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { format } from "date-fns";
-import { toast } from "react-hot-toast";
+import {
+  deleteTodo,
+  fetchTodos,
+  patchTodo,
+  postTodo,
+  todoStatusChange,
+} from "../../api/todosAPI";
 // import { fetchCount } from './counterAPI';
 
 const initialState = {
@@ -14,89 +18,25 @@ const initialState = {
 // will call the thunk with the `dispatch` function as the first argument. Async
 // code can then be executed and other actions can be dispatched. Thunks are
 // typically used to make async requests.
-export const getTodos = createAsyncThunk("todos/fetch", async () => {
-  const { data } = await axios.get(
-    "https://jsonplaceholder.typicode.com/todos"
-  );
-  return data;
-});
+export const getTodos = createAsyncThunk("todos/fetch", async () =>
+  fetchTodos()
+);
 
-export const addTodo = createAsyncThunk("todos/add", async (data) => {
-  data.createdAt = format(new Date(), "dd-MM-yyyy");
-  const res = await axios.post(
-    "https://jsonplaceholder.typicode.com/todos",
-    data
-  );
+export const addTodo = createAsyncThunk("todos/add", async (data) =>
+  postTodo(data)
+);
 
-  if (res.status === 201) {
-    toast.success("Task added Successfully!", {
-      icon: "👏",
-      style: {
-        borderRadius: "5px",
-        background: "#d06d6d",
-        color: "#fff",
-      },
-    });
-  }
-  return data;
-});
+export const editTodo = createAsyncThunk("todos/edit", async (data) =>
+  patchTodo(data)
+);
 
-export const editTodo = createAsyncThunk("todos/edit", async (data) => {
-  const res = await axios.patch(
-    `https://jsonplaceholder.typicode.com/todos/${data.id}`,
-    data
-  );
+export const removeTodo = createAsyncThunk("todos/remove", async (id) =>
+  deleteTodo(id)
+);
 
-  if (res.status === 200) {
-    toast.success("Title changed Successfully!", {
-      icon: "👏",
-      style: {
-        borderRadius: "5px",
-        background: "#d06d6d",
-        color: "#fff",
-      },
-    });
-  }
-  return data;
-});
-
-export const removeTodo = createAsyncThunk("todos/remove", async (id) => {
-  const data = await axios.delete(
-    `https://jsonplaceholder.typicode.com/todos/${id}`
-  );
-
-  if (data.status === 200) {
-    toast("Task has been Deleted!", {
-      icon: "👏",
-      style: {
-        borderRadius: "5px",
-        background: "#d06d6d",
-        color: "#fff",
-      },
-    });
-  }
-  return id;
-});
-
-export const resolveTodo = createAsyncThunk("todos/resolve", async (data) => {
-  data.completedAt = format(new Date(), "dd-MM-yyyy");
-  const res = await axios.patch(
-    `https://jsonplaceholder.typicode.com/todos/${data.id}`,
-    data
-  );
-
-  if (res.status === 200) {
-    toast.success("Status changed Successfully!", {
-      icon: "👏",
-      style: {
-        borderRadius: "5px",
-        background: "#d06d6d",
-        color: "#fff",
-      },
-    });
-  }
-  return data;
-});
+export const resolveTodo = createAsyncThunk("todos/resolve", async (data) =>
+  todoStatusChange(data)
+);
 
 export const todoSlice = createSlice({
   name: "todos",
